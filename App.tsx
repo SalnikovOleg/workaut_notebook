@@ -3,9 +3,7 @@ import { Text, View, ActivityIndicator, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useWorkoutStore } from './src/store/useWorkoutStore';
-import ExercisesScreen from './src/screens/ExercisesScreen';
-import ScheduleScreen from './src/screens/ScheduleScreen';
-import LogsScreen from './src/screens/LogsScreen';
+import MainTabs from './src/components/MainTabs';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,10 +32,12 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Schedule">
-        <Stack.Screen name="Schedule" component={ScheduleScreen} options={{ title: 'Workout Schedule' }} />
-        <Stack.Screen name="Logs" component={LogsScreen} options={{ title: 'Workout Logs' }} />
-        <Stack.Screen name="Exercises" component={ExercisesScreen} options={{ title: 'Exercise Library' }} />
+      <Stack.Navigator initialRouteName="Main">
+        <Stack.Screen
+          name="Main"
+          component={MainTabs}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
