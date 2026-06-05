@@ -1,4 +1,5 @@
-import { ScheduleRepository, ExerciseRepository } from '../repositories';
+import { ScheduleRepository } from '../repositories/scheduleRepository';
+import { ExerciseRepository } from '../repositories/exerciseRepository';
 import { WeeklySchedule, Exercise } from '../types';
 
 export class ScheduleService {

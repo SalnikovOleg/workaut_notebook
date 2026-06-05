@@ -3,6 +3,7 @@ import { initDatabase } from '../database/db';
 import { ExerciseRepository } from '../repositories/exerciseRepository';
 import { LogRepository } from '../repositories/logRepository';
 import { ScheduleRepository } from '../repositories/scheduleRepository';
+import { ScheduleService } from '../services/scheduleService';
 import { Exercise, WorkoutLog } from '../types';
 
 interface WorkoutState {
@@ -15,6 +16,7 @@ interface WorkoutState {
   exerciseRepo: ExerciseRepository | null;
   logRepo: LogRepository | null;
   scheduleRepo: ScheduleRepository | null;
+  scheduleService: ScheduleService | null;
 
   // Actions
   initialize: () => Promise<void>;
@@ -35,6 +37,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   exerciseRepo: null,
   logRepo: null,
   scheduleRepo: null,
+  scheduleService: null,
 
   initialize: async () => {
     set({ isLoading: true });
@@ -43,7 +46,8 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       const exerciseRepo = new ExerciseRepository(db);
       const logRepo = new LogRepository(db);
       const scheduleRepo = new ScheduleRepository(db);
-      set({ exerciseRepo, logRepo, scheduleRepo, isLoading: false });
+      const scheduleService = new ScheduleService(scheduleRepo, exerciseRepo);
+      set({ exerciseRepo, logRepo, scheduleRepo, scheduleService, isLoading: false });
     } catch (err) {
       set({ error: (err as Error).message, isLoading: false });
     }
@@ -120,7 +124,6 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     if (!logRepo) return;
     try {
       await logRepo.logSet(log);
-      // Optimistic update could be added here
     } catch (err) {
       set({ error: (err as Error).message });
     }

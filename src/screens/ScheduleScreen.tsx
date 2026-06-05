@@ -40,7 +40,7 @@ const ScheduleScreen = () => {
   const loadCounts = async () => {
     try {
       const dayCounts = await service?.getExerciseCounts();
-      setCounts(dayCounts);
+      setCounts(dayCounts ?? []);
     } catch (err) {
       console.error('Failed to load counts:', err);
     }
