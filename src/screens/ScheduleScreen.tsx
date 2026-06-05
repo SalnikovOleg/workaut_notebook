@@ -174,7 +174,15 @@ const ScheduleScreen = () => {
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <Text style={styles.exerciseName}>{item.exercise.name}</Text>
+            <View style={styles.exerciseHeader}>
+              <Text style={styles.exerciseName}>{item.exercise.name}</Text>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => handleDeleteExercise(item)}
+              >
+                <Ionicons name="trash-outline" size={20} color="#f86e67" />
+              </TouchableOpacity>
+            </View>
 
             <View style={styles.controlsContainer}>
               <View style={styles.controlGroup}>
@@ -217,14 +225,6 @@ const ScheduleScreen = () => {
                 </View>
               </View>
             </View>
-
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => handleDeleteExercise(item)}
-            >
-              <Ionicons name="trash-outline" size={20} color="#f86e67" />
-              <Text style={styles.deleteText}>Delete</Text>
-            </TouchableOpacity>
           </View>
         )}
         ListEmptyComponent={
@@ -294,7 +294,13 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  exerciseName: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 15 },
+  exerciseHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  exerciseName: { fontSize: 18, fontWeight: 'bold', color: '#333' },
   controlsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
