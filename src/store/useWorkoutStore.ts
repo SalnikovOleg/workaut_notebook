@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { initDatabase } from '../database/db';
 import { ExerciseRepository } from '../repositories/exerciseRepository';
 import { LogRepository } from '../repositories/logRepository';
+import { ScheduleRepository } from '../repositories/scheduleRepository';
 import { Exercise, WorkoutLog } from '../types';
 
 interface WorkoutState {
@@ -13,12 +14,16 @@ interface WorkoutState {
   // Repositories
   exerciseRepo: ExerciseRepository | null;
   logRepo: LogRepository | null;
+  scheduleRepo: ScheduleRepository | null;
 
   // Actions
   initialize: () => Promise<void>;
   fetchExercises: () => Promise<void>;
   fetchLogsByDate: (date: string) => Promise<void>;
   addExercise: (exercise: Omit<Exercise, 'id'>) => Promise<void>;
+  updateExercise: (id: number, exercise: Partial<Exercise>) => Promise<void>;
+  deleteExercise: (id: number) => Promise<void>;
+  isExerciseUsed: (id: number) => Promise<boolean>;
   logSet: (log: Omit<WorkoutLog, 'id'>) => Promise<void>;
 }
 
@@ -29,6 +34,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   error: null,
   exerciseRepo: null,
   logRepo: null,
+  scheduleRepo: null,
 
   initialize: async () => {
     set({ isLoading: true });
@@ -36,7 +42,8 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       const db = await initDatabase();
       const exerciseRepo = new ExerciseRepository(db);
       const logRepo = new LogRepository(db);
-      set({ exerciseRepo, logRepo, isLoading: false });
+      const scheduleRepo = new ScheduleRepository(db);
+      set({ exerciseRepo, logRepo, scheduleRepo, isLoading: false });
     } catch (err) {
       set({ error: (err as Error).message, isLoading: false });
     }
@@ -72,6 +79,39 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       await get().fetchExercises();
     } catch (err) {
       set({ error: (err as Error).message });
+    }
+  },
+
+  updateExercise: async (id, exercise) => {
+    const { exerciseRepo } = get();
+    if (!exerciseRepo) return;
+    try {
+      await exerciseRepo.updateExercise(id, exercise);
+      await get().fetchExercises();
+    } catch (err) {
+      set({ error: (err as Error).message });
+    }
+  },
+
+  deleteExercise: async (id) => {
+    const { exerciseRepo } = get();
+    if (!exerciseRepo) return;
+    try {
+      await exerciseRepo.softDeleteExercise(id);
+      await get().fetchExercises();
+    } catch (err) {
+      set({ error: (err as Error).message });
+    }
+  },
+
+  isExerciseUsed: async (id) => {
+    const { scheduleRepo } = get();
+    if (!scheduleRepo) return false;
+    try {
+      return await scheduleRepo.isExerciseUsed(id);
+    } catch (err) {
+      set({ error: (err as Error).message });
+      return false;
     }
   },
 

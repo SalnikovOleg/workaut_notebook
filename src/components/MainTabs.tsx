@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { ComponentProps } from 'react';
 import ScheduleScreen from '../screens/ScheduleScreen';
 import WorkoutScreen from '../screens/WorkoutScreen';
 import ExercisesScreen from '../screens/ExercisesScreen';
@@ -12,17 +13,17 @@ export default function MainTabs() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName: string = '';
+          let iconName: ComponentProps<typeof Ionicons>['name'] = 'fitness';
 
           if (route.name === 'Schedule') {
             iconName = focused ? 'calendar' : 'calendar-outline';
           } else if (route.name === 'Workout') {
-            iconName = focused ? 'trending-up' : 'trending-up-outline';
+            iconName = focused ? 'fitness' : 'fitness-outline';
           } else if (route.name === 'Exercises') {
-            iconName = focused ? 'fitness' : 'fitness-outline'; // 'dumbbell' is often 'fitness' in Ionicons
+            iconName = focused ? 'list' : 'list-outline'; // 'dumbbell' is often 'fitness' in Ionicons
           }
 
-          return <Ionicons name={iconName as any} size={size} color={color} />;
+          return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#007AFF',
         tabBarInactiveTintColor: 'gray',

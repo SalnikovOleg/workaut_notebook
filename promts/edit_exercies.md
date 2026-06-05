@@ -1,5 +1,6 @@
 # On page ExercisesScreen add deleteing and edition feateures
 For each exercise item add 2 buttons for deleteing and edition item.
+Use icons instead text. Pencil for edit. and trash for deleting
 
 ## Deleting feature
 * By clicking button delete show confirmation dialog.
@@ -27,3 +28,4 @@ For each exercise item add 2 buttons for deleteing and edition item.
 * Use React Native components compatible with Expo.
 * Create a clean and modern mobile UI.
 * Use `StyleSheet.create` for styling.
+* Use `expo/vector-icons` for buttons.

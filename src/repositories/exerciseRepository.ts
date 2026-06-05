@@ -5,7 +5,7 @@ export class ExerciseRepository {
   constructor(private db: SQLite.SQLiteDatabase) {}
 
   async getAllExercises(): Promise<Exercise[]> {
-    return await this.db.getAllAsync<Exercise>('SELECT * FROM exercises');
+    return await this.db.getAllAsync<Exercise>('SELECT * FROM exercises WHERE deleted = 0');
   }
 
   async getExerciseById(id: number): Promise<Exercise | null> {
@@ -22,14 +22,19 @@ export class ExerciseRepository {
   }
 
   async updateExercise(id: number, exercise: Partial<Exercise>): Promise<void> {
-    const fields = Object.keys(exercise).filter(key => key !== 'id');
-    const values = fields.map(key => (exercise as any)[key]);
-    const setClause = fields.map(field => `${field} = ?`).join(', ');
+    const fields = Object.keys(exercise) as Array<keyof Exercise>;
+    const filteredFields = fields.filter(key => key !== 'id');
+    const values = filteredFields.map(key => (exercise[key] as unknown));
+    const setClause = filteredFields.map(field => `${String(field)} = ?`).join(', ');
 
     await this.db.runAsync(`UPDATE exercises SET ${setClause} WHERE id = ?`, [...values, id]);
   }
 
   async deleteExercise(id: number): Promise<void> {
     await this.db.runAsync('DELETE FROM exercises WHERE id = ?', [id]);
+  }
+
+  async softDeleteExercise(id: number): Promise<void> {
+    await this.db.runAsync('UPDATE exercises SET deleted = 1 WHERE id = ?', [id]);
   }
 }

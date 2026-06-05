@@ -12,14 +12,16 @@ import {
   ScrollView
 } from 'react-native';
 import { useWorkoutStore } from '../store/useWorkoutStore';
+import { Exercise } from '../types';
 
 interface ExerciseFormModalProps {
   isVisible: boolean;
   onClose: () => void;
+  editExercise?: Exercise | null;
 }
 
-const ExerciseFormModal = ({ isVisible, onClose }: ExerciseFormModalProps) => {
-  const { addExercise } = useWorkoutStore();
+const ExerciseFormModal = ({ isVisible, onClose, editExercise }: ExerciseFormModalProps) => {
+  const { addExercise, updateExercise } = useWorkoutStore();
 
   const [name, setName] = useState('');
   const [type, setType] = useState(1); // 1: Reps, 2: Time
@@ -28,13 +30,20 @@ const ExerciseFormModal = ({ isVisible, onClose }: ExerciseFormModalProps) => {
 
   useEffect(() => {
     if (isVisible) {
-      // Reset form when opening
-      setName('');
-      setType(1);
-      setMinSets('');
-      setMinRepsOrTime('');
+      if (editExercise) {
+        setName(editExercise.name);
+        setType(editExercise.type);
+        setMinSets(editExercise.min_sets.toString());
+        setMinRepsOrTime(editExercise.min_reps_or_time.toString());
+      } else {
+        // Reset form when opening for create
+        setName('');
+        setType(1);
+        setMinSets('');
+        setMinRepsOrTime('');
+      }
     }
-  }, [isVisible]);
+  }, [isVisible, editExercise]);
 
   const validate = () => {
     if (name.trim().length === 0) return 'Exercise name is required';
@@ -52,16 +61,23 @@ const ExerciseFormModal = ({ isVisible, onClose }: ExerciseFormModalProps) => {
     }
 
     try {
-      await addExercise({
+      const exerciseData = {
         name: name.trim(),
         type: type,
         min_sets: parseInt(minSets, 10),
         min_reps_or_time: parseInt(minRepsOrTime, 10),
-      });
-      Alert.alert('Success', 'Exercise created successfully!');
+      };
+
+      if (editExercise) {
+        await updateExercise(editExercise.id, exerciseData);
+        Alert.alert('Success', 'Exercise updated successfully!');
+      } else {
+        await addExercise(exerciseData);
+        Alert.alert('Success', 'Exercise created successfully!');
+      }
       onClose();
-    } catch (err) {
-      Alert.alert('Error', 'Failed to create exercise');
+    } catch {
+      Alert.alert('Error', editExercise ? 'Failed to update exercise' : 'Failed to create exercise');
     }
   };
 
@@ -80,7 +96,7 @@ const ExerciseFormModal = ({ isVisible, onClose }: ExerciseFormModalProps) => {
         >
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.header}>
-              <Text style={styles.title}>Create New Exercise</Text>
+              <Text style={styles.title}>{editExercise ? 'Edit Exercise' : 'Create New Exercise'}</Text>
               <TouchableOpacity onPress={onClose}>
                 <Text style={styles.closeButton}>Cancel</Text>
               </TouchableOpacity>

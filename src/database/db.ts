@@ -11,7 +11,8 @@ export async function initDatabase() {
       name TEXT NOT NULL,
       type INTEGER NOT NULL,
       min_sets INTEGER NOT NULL,
-      min_reps_or_time INTEGER NOT NULL
+      min_reps_or_time INTEGER NOT NULL,
+      deleted INTEGER DEFAULT 0
     );
 
     CREATE TABLE IF NOT EXISTS weekly_schedule (
@@ -41,6 +42,13 @@ export async function initDatabase() {
       FOREIGN KEY (exercise_id) REFERENCES exercises (id) ON DELETE CASCADE
     );
   `);
+
+  // Ensure 'deleted' column exists for existing databases
+  try {
+    await db.execAsync('ALTER TABLE exercises ADD COLUMN deleted INTEGER DEFAULT 0;');
+  } catch {
+    // Ignore error if column already exists
+  }
 
   return db;
 }
