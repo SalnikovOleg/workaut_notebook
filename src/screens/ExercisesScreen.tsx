@@ -4,6 +4,7 @@ import { useWorkoutStore } from '../store/useWorkoutStore';
 import ExerciseFormModal from '../components/ExerciseFormModal';
 import { Exercise } from '../types';
 import { Ionicons } from '@expo/vector-icons';
+import { screenStyles } from '../styles/screenStyles';
 
 const ExercisesScreen = () => {
   const { exercises, fetchExercises, isLoading, deleteExercise, isExerciseUsed } = useWorkoutStore();
@@ -42,11 +43,11 @@ const ExercisesScreen = () => {
     );
   };
 
-  if (isLoading) return <View style={styles.center}><Text>Loading...</Text></View>;
+  if (isLoading) return <View style={screenStyles.center}><Text>Loading...</Text></View>;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Exercises</Text>
+    <View style={screenStyles.container}>
+      <Text style={screenStyles.title}>Exercises</Text>
       <FlatList
         data={exercises}
         keyExtractor={(item) => item.id.toString()}
@@ -67,10 +68,10 @@ const ExercisesScreen = () => {
         )}
       />
       <TouchableOpacity
-        style={styles.fab}
+        style={screenStyles.fab}
         onPress={() => setIsModalVisible(true)}
       >
-        <Text style={styles.fabText}>+</Text>
+        <Text style={screenStyles.fabText}>+</Text>
       </TouchableOpacity>
       <ExerciseFormModal
         isVisible={isModalVisible}
@@ -85,9 +86,6 @@ const ExercisesScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
   item: {
     padding: 15,
     borderBottomWidth: 1,
@@ -113,27 +111,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: '#333',
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 30,
-    right: 20,
-    backgroundColor: '#007AFF',
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-  },
-  fabText: {
-    color: 'white',
-    fontSize: 30,
-    fontWeight: 'bold',
   },
 });
 

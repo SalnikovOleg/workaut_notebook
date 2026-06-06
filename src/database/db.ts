@@ -43,11 +43,35 @@ export async function initDatabase() {
     );
   `);
 
-  // Ensure 'deleted' column exists for existing databases
-  try {
-    await db.execAsync('ALTER TABLE exercises ADD COLUMN deleted INTEGER DEFAULT 0;');
-  } catch {
-    // Ignore error if column already exists
+  // Helper to ensure columns exist (for migrations)
+  async function ensureColumn(table: string, column: string, type: string, defaultValue: string = '') {
+    const tableInfo = await db.getAllAsync(`PRAGMA table_info(${table})`);
+    const hasColumn = tableInfo.some((col: any) => col.name === column);
+    if (!hasColumn) {
+      const def = defaultValue ? ` DEFAULT ${defaultValue}` : '';
+      await db.execAsync(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}${def}`);
+    }
+  }
+
+  // Run migrations
+  await ensureColumn('exercises', 'deleted', 'INTEGER', '0');
+  await ensureColumn('weekly_schedule', 'day_of_week', 'INTEGER', '0');
+  await ensureColumn('calendar_schedule', 'date', 'TEXT', "''");
+  await ensureColumn('workout_logs', 'exercise_id', 'INTEGER', '0');
+
+  const countResult = await db.getFirstAsync<{ count: number }>(
+    'SELECT COUNT(*) as count FROM exercises'
+  );
+
+  if ((countResult?.count ?? 0) === 0) {
+    await db.execAsync(`
+      INSERT INTO exercises (name, type, min_sets, min_reps_or_time) VALUES
+        ('Push-ups', 1, 4, 30),
+        ('Pull-ups', 1, 4, 5),
+        ('Dips', 1, 4, 15),
+        ('Squats', 1, 3, 50),
+        ('Plank', 2, 3, 120);
+    `);
   }
 
   return db;

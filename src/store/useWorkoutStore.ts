@@ -3,7 +3,9 @@ import { initDatabase } from '../database/db';
 import { ExerciseRepository } from '../repositories/exerciseRepository';
 import { LogRepository } from '../repositories/logRepository';
 import { ScheduleRepository } from '../repositories/scheduleRepository';
+import { StatisticsRepository } from '../repositories/statisticsRepository';
 import { ScheduleService } from '../services/scheduleService';
+import { StatisticsService } from '../services/statisticsService';
 import { Exercise, WorkoutLog } from '../types';
 
 interface WorkoutState {
@@ -17,6 +19,7 @@ interface WorkoutState {
   logRepo: LogRepository | null;
   scheduleRepo: ScheduleRepository | null;
   scheduleService: ScheduleService | null;
+  statisticsService: StatisticsService | null;
 
   // Actions
   initialize: () => Promise<void>;
@@ -38,6 +41,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   logRepo: null,
   scheduleRepo: null,
   scheduleService: null,
+  statisticsService: null,
 
   initialize: async () => {
     set({ isLoading: true });
@@ -46,8 +50,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       const exerciseRepo = new ExerciseRepository(db);
       const logRepo = new LogRepository(db);
       const scheduleRepo = new ScheduleRepository(db);
+      const statisticsRepo = new StatisticsRepository(db);
       const scheduleService = new ScheduleService(scheduleRepo, exerciseRepo);
-      set({ exerciseRepo, logRepo, scheduleRepo, scheduleService, isLoading: false });
+      const statisticsService = new StatisticsService(statisticsRepo);
+      set({ exerciseRepo, logRepo, scheduleRepo, scheduleService, statisticsService, isLoading: false });
     } catch (err) {
       set({ error: (err as Error).message, isLoading: false });
     }

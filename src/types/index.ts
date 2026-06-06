@@ -31,3 +31,20 @@ export interface WorkoutLog {
   reps_done_or_actual_time: number;
   timestamp: string;
 }
+
+export interface StatisticsSummary {
+  totalEntries: number;
+  totalSets: number;
+  totalRepsOrTime: number;
+  distinctExercises: number;
+}
+
+export interface DailyActivity {
+  date: string;
+  setCount: number;
+}
+
+export interface TopExercise {
+  name: string;
+  setCount: number;
+}

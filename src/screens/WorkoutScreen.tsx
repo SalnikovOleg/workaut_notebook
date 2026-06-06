@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { screenStyles } from '../styles/screenStyles';
 import { useWorkoutStore } from '../store/useWorkoutStore';
 import { WeeklySchedule, Exercise } from '../types';
 import LogSetModal from '../components/LogSetModal';
@@ -35,25 +37,27 @@ const WorkoutScreen = () => {
   const today = new Date().toISOString().split('T')[0];
   const dayOfWeek = (new Date().getDay() + 6) % 7 + 1; // Convert 0-6 (Sun-Sat) to 1-7 (Mon-Sun)
 
-  useEffect(() => {
-    const loadData = async () => {
-      if (!scheduleService) return;
+  useFocusEffect(
+    useCallback(() => {
+      const loadData = async () => {
+        if (!scheduleService) return;
 
-      try {
-        const data = await scheduleService.getDaySchedule(dayOfWeek);
-        const mappedSchedule = data.map(item => {
-          const { exercise, ...schedule } = item;
-          return { exercise, schedule };
-        });
-        setTodaySchedule(mappedSchedule);
-        await fetchLogsByDate(today);
-      } catch (err) {
-        console.error('Error loading workout data:', err);
-      }
-    };
+        try {
+          const data = await scheduleService.getDaySchedule(dayOfWeek);
+          const mappedSchedule = data.map(item => {
+            const { exercise, ...schedule } = item;
+            return { exercise, schedule };
+          });
+          setTodaySchedule(mappedSchedule);
+          await fetchLogsByDate(today);
+        } catch (err) {
+          console.error('Error loading workout data:', err);
+        }
+      };
 
-    loadData();
-  }, [scheduleService, dayOfWeek]);
+      loadData();
+    }, [scheduleService, dayOfWeek, today, fetchLogsByDate])
+  );
 
   const calculateActuals = (exerciseId: number) => {
     const exerciseLogs = logs.filter((l) => l.exercise_id === exerciseId);
@@ -73,7 +77,7 @@ const WorkoutScreen = () => {
 
     return (
       <TouchableOpacity
-        style={[styles.card, isCompleted && styles.cardCompleted]}
+        style={[screenStyles.card, isCompleted && styles.cardCompleted]}
         onPress={() => setSelectedExercise({ exercise, schedule })}
       >
         <View style={styles.cardHeader}>
@@ -103,7 +107,7 @@ const WorkoutScreen = () => {
 
   if (isLoading) {
     return (
-      <View style={styles.center}>
+      <View style={screenStyles.center}>
         <ActivityIndicator size="large" color="#007AFF" />
         <Text style={styles.loadingText}>Loading your workout...</Text>
       </View>
@@ -112,30 +116,28 @@ const WorkoutScreen = () => {
 
   if (error) {
     return (
-      <View style={styles.center}>
+      <View style={screenStyles.center}>
         <Text style={styles.errorText}>{error}</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Today's Workout</Text>
+    <View style={screenStyles.container}>
+        <Text style={screenStyles.title}>Today's Workout</Text>
         <Text style={styles.date}>{today}</Text>
-      </View>
 
       {todaySchedule.length === 0 ? (
-        <View style={styles.emptyContainer}>
+        <View style={screenStyles.emptyState}>
           <Ionicons name="calendar-outline" size={64} color="#ccc" />
-          <Text style={styles.emptyText}>No exercises scheduled for today!</Text>
+          <Text style={screenStyles.emptyText}>No exercises scheduled for today!</Text>
         </View>
       ) : (
         <FlatList
           data={todaySchedule}
           keyExtractor={(item) => item.schedule.id.toString()}
           renderItem={renderExerciseCard}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={screenStyles.listContent}
         />
       )}
 
@@ -152,36 +154,10 @@ const WorkoutScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-  },
   date: {
     fontSize: 16,
     color: '#666',
     marginTop: 4,
-  },
-  listContent: {
-    padding: 20,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   cardCompleted: {
     borderColor: '#4CAF50',
@@ -216,12 +192,6 @@ const styles = StyleSheet.create({
     color: '#333',
     fontWeight: '500',
   },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-  },
   loadingText: {
     marginTop: 10,
     color: '#666',
@@ -230,18 +200,6 @@ const styles = StyleSheet.create({
     color: 'red',
     textAlign: 'center',
     padding: 20,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-  },
-  emptyText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#999',
-    textAlign: 'center',
   },
 });
 

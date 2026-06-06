@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { screenStyles } from '../styles/screenStyles';
 import { useWorkoutStore } from '../store/useWorkoutStore';
 import { useScheduleStore } from '../store/useScheduleStore';
 import { ScheduleService } from '../services/scheduleService';
@@ -123,15 +124,15 @@ const ScheduleScreen = () => {
 
   if (!service) {
     return (
-      <View style={styles.center}>
+      <View style={screenStyles.center}>
         <Text>Initializing database...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Weekly Schedule</Text>
+    <View style={screenStyles.container}>
+      <Text style={screenStyles.title}>Weekly Schedule</Text>
 
       <View style={styles.daySelector}>
         <View style={styles.dayRow}>
@@ -171,9 +172,9 @@ const ScheduleScreen = () => {
       <FlatList
         data={schedule}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={screenStyles.listContent}
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <View style={screenStyles.card}>
             <View style={styles.exerciseHeader}>
               <Text style={styles.exerciseName}>{item.exercise.name}</Text>
               <TouchableOpacity
@@ -228,14 +229,14 @@ const ScheduleScreen = () => {
           </View>
         )}
         ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No exercises scheduled for this day.</Text>
+          <View style={screenStyles.emptyState}>
+            <Text style={screenStyles.emptyText}>No exercises scheduled for this day.</Text>
           </View>
         }
       />
 
       <TouchableOpacity
-        style={styles.fab}
+        style={screenStyles.fab}
         onPress={handleOpenModal}
       >
         <Ionicons name="add" size={30} color="white" />
@@ -253,9 +254,6 @@ const ScheduleScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5', padding: 20 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: '#333', textAlign: 'center' },
   daySelector: { marginBottom: 20 },
   dayRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
   dayButton: {
@@ -282,18 +280,6 @@ const styles = StyleSheet.create({
   dayTextSelected: { color: 'white' },
   countText: { fontSize: 12, color: '#999' },
   countTextSelected: { color: 'rgba(255,255,255,0.8)' },
-  listContent: { paddingBottom: 100 },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 15,
-    padding: 15,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
   exerciseHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -350,30 +336,6 @@ const styles = StyleSheet.create({
     color: '#f86e67',
     fontWeight: '600',
     marginLeft: 5,
-  },
-  emptyState: {
-    alignItems: 'center',
-    marginTop: 50,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#999',
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 30,
-    right: 20,
-    backgroundColor: '#007AFF',
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
   },
 });
 

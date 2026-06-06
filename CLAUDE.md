@@ -7,6 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run android`: Start and run on Android
 - `npm run ios`: Start and run on iOS
 - `npm run web`: Start and run on Web
+- `npm run lint`: Lint the codebase
+- `npm run lint:fix`: Automatically fix linting errors
 
 ## Architecture
 The project follows a strict separation of concerns using a Repository Pattern:
@@ -19,6 +21,8 @@ The project follows a strict separation of concerns using a Repository Pattern:
 - `src/services`: Business logic that may orchestrate multiple repositories.
 - `src/store`: State management using Zustand.
 - `src/screens`: UI components and screens.
+- `src/components`: UI components like a modal forms and Main tabs.
+- `src/styles`: Common styles.
 
 ### Data Model
 The app manages three core domains:

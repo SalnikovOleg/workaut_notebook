@@ -5,6 +5,8 @@ import { ComponentProps } from 'react';
 import ScheduleScreen from '../screens/ScheduleScreen';
 import WorkoutScreen from '../screens/WorkoutScreen';
 import ExercisesScreen from '../screens/ExercisesScreen';
+import StatisticsScreen from '../screens/StatisticsScreen';
+import DevDbScreen from '../screens/DevDbScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -21,6 +23,10 @@ export default function MainTabs() {
             iconName = focused ? 'fitness' : 'fitness-outline';
           } else if (route.name === 'Exercises') {
             iconName = focused ? 'list' : 'list-outline'; // 'dumbbell' is often 'fitness' in Ionicons
+          } else if (route.name === 'Statistics') {
+            iconName = focused ? 'stats-chart' : 'stats-chart-outline';
+          } else if (route.name === 'DevDB') {
+            iconName = focused ? 'server' : 'server-outline';
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -48,6 +54,18 @@ export default function MainTabs() {
         component={ExercisesScreen}
         options={{ title: 'Exercises' }}
       />
+      <Tab.Screen
+        name="Statistics"
+        component={StatisticsScreen}
+        options={{ title: 'Statistics' }}
+      />
+      {__DEV__ && (
+        <Tab.Screen
+          name="DevDB"
+          component={DevDbScreen}
+          options={{ title: 'Dev DB' }}
+        />
+      )}
     </Tab.Navigator>
   );
 }
