@@ -16,12 +16,12 @@ import { StatisticsSummary, DailyActivity, TopExercise } from '../types';
 
 const screenWidth = Dimensions.get('window').width;
 
-type DateRange = '7' | '30' | '90' | 'custom';
+const DATE_RANGES = ['7', '30', '60', '90'] as const;
+type DateRange = typeof DATE_RANGES[number];
 
 const StatisticsScreen = () => {
   const { statisticsService, isLoading: storeLoading, error: storeError } = useWorkoutStore();
-  const [range, setRange] = useState<DateRange>('30');
-  const [customRange, setCustomRange] = useState({ start: '', end: '' });
+  const [range, setRange] = useState<DateRange>('7');
   const [data, setData] = useState<{
     summary: StatisticsSummary | null;
     activity: DailyActivity[];
@@ -38,18 +38,8 @@ const StatisticsScreen = () => {
     const end = new Date();
     const start = new Date();
 
-    if (selectedRange === '7') {
-      start.setDate(end.getDate() - 7);
-    } else if (selectedRange === '30') {
-      start.setDate(end.getDate() - 30);
-    } else if (selectedRange === '90') {
-      start.setDate(end.getDate() - 90);
-    } else {
-      return {
-        start: customRange.start || '1970-01-01',
-        end: customRange.end || end.toISOString().split('T')[0],
-      };
-    }
+    const daysAgo = Number(selectedRange);
+    start.setDate(end.getDate() - daysAgo);
 
     return {
       start: start.toISOString().split('T')[0] + ' 00:00:00',
@@ -65,12 +55,12 @@ const StatisticsScreen = () => {
 
     try {
       const { start, end } = calculateDates(range);
+      console.log(start, end);
       const [summary, activity, topExercises] = await Promise.all([
         statisticsService.getSummary(start, end),
         statisticsService.getActivityTrend(start, end),
         statisticsService.getTopExercises(start, end),
       ]);
-
       setData({ summary, activity, topExercises });
     } catch (err) {
       setError((err as Error).message);
@@ -135,28 +125,21 @@ const StatisticsScreen = () => {
 
   return (
     <ScrollView style={screenStyles.container} contentContainerStyle={styles.scrollContent}>
-      <Text style={screenStyles.title}>Statistics</Text>
 
       <View style={styles.filterContainer}>
-        {(['7', '30', '90', 'custom'] as const).map((r) => (
+        {DATE_RANGES.map((r) => (
           <TouchableOpacity
             key={r}
             style={[styles.filterButton, range === r && styles.filterButtonActive]}
             onPress={() => setRange(r)}
           >
             <Text style={[styles.filterButtonText, range === r && styles.filterButtonTextActive]}>
-              {r === 'custom' ? 'Custom' : `${r} Days`}
+              {`${r} Days`}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      <View style={styles.summaryGrid}>
-        {renderSummaryCard('Total Logs', summary.totalEntries, 'document-text-outline')}
-        {renderSummaryCard('Total Sets', summary.totalSets, 'list-circle-outline')}
-        {renderSummaryCard('Reps/Time', summary.totalRepsOrTime, 'timer-outline')}
-        {renderSummaryCard('Exercises', summary.distinctExercises, 'fitness-outline')}
-      </View>
 
       <View style={styles.chartSection}>
         <Text style={styles.sectionTitle}>Activity Trend</Text>
@@ -165,20 +148,17 @@ const StatisticsScreen = () => {
             labels: activityLabels.length > 0 ? activityLabels : ['No Data'],
             datasets: [{ data: activityValues.length > 0 ? activityValues : [0] }],
           } as any}
-          width={screenWidth - 32}
+          width={screenWidth - 54}
           height={220}
           chartConfig={{
-            backgroundColor: '#ffffff',
-            backgroundGradientColor: '#ffffff',
-            borderColor: '#e0e0e0',
+            backgroundGradientFrom: '#fff',
+            backgroundGradientTo: '#fff',
             decimalPlaces: 0,
-            color: '#007AFF',
-            labelColors: '#666',
-            style: {},
+            color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`,
             propsForDots: { r: '4', strokeWidth: '2', stroke: '#007AFF' },
           } as any}
           bezier
-          style={styles.chart}
+          style={{ ...styles.chart}}
         />
       </View>
 
@@ -190,21 +170,19 @@ const StatisticsScreen = () => {
               labels: topExerciseLabels,
               datasets: [{ data: topExerciseValues }],
             } as any}
-            width={screenWidth - 32}
-            height={220}
+            width={screenWidth - 54}
+            height={300}
             chartConfig={{
-              backgroundColor: '#ffffff',
-              backgroundGradientColor: '#ffffff',
-              borderColor: '#e0e0e0',
+              backgroundGradientFrom: '#fff',
+              backgroundGradientTo: '#fff',
               decimalPlaces: 0,
-              color: '#007AFF',
-              labelColors: '#666',
+              color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`,
               style: {},
             } as any}
             verticalLabelRotation={30}
             yAxisLabel=""
             yAxisSuffix=""
-            style={styles.chart}
+            style={{ ...styles.chart, marginLeft: 0 }}
           />
         ) : (
           <Text style={screenStyles.emptyText}>No exercises performed.</Text>
@@ -278,7 +256,7 @@ const styles = StyleSheet.create({
   },
   chartSection: {
     backgroundColor: '#fff',
-    padding: 16,
+    padding: 10,
     borderRadius: 16,
     marginBottom: 20,
     elevation: 2,
@@ -293,11 +271,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 15,
+    marginBottom: 10,
   },
   chart: {
-    marginRight: 16,
-    borderRadius: 16,
+    marginLeft: -10,
+    borderRadius: 10,
   },
   loadingText: {
     marginTop: 10,

@@ -30,10 +30,17 @@ export default function DevDbScreen() {
     setIsLoading(true);
     try {
       const db = await SQLite.openDatabaseAsync('scheduler.db');
-      const result = await db.getAllAsync<{ name: string }>(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';"
-      );
-      setTables(result.map((row) => row.name));
+      const stmt = await db.prepareAsync("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';");
+      try {
+        const result = await stmt.executeAsync();
+        const rows = [];
+        for await (const row of result) {
+          rows.push(row);
+        }
+        setTables(rows.map((row: any) => row.name));
+      } finally {
+        await stmt.finalizeAsync();
+      }
     } catch (error: any) {
       Alert.alert('Error fetching tables', error.message);
     } finally {
@@ -46,8 +53,17 @@ export default function DevDbScreen() {
     setSelectedTable(tableName);
     try {
       const db = await SQLite.openDatabaseAsync('scheduler.db');
-      const result = await db.getAllAsync(`PRAGMA table_info('${tableName}');`);
-      setColumns(result);
+      const stmt = await db.prepareAsync(`PRAGMA table_info('${tableName}');`);
+      try {
+        const result = await stmt.executeAsync();
+        const rows = [];
+        for await (const row of result) {
+          rows.push(row);
+        }
+        setColumns(rows);
+      } finally {
+        await stmt.finalizeAsync();
+      }
     } catch (error: any) {
       Alert.alert('Error fetching columns', error.message);
     } finally {
@@ -101,12 +117,21 @@ export default function DevDbScreen() {
       const normalizedQuery = query.trim().toUpperCase();
 
       if (normalizedQuery.startsWith('SELECT') || normalizedQuery.startsWith('PRAGMA')) {
-        const result = await db.getAllAsync(query);
-        setResults(result);
-        setStatus({
-          message: `Returned ${result.length} rows`,
-          isError: false,
-        });
+        const stmt = await db.prepareAsync(query);
+        try {
+          const result = await stmt.executeAsync();
+          const rows = [];
+          for await (const row of result) {
+            rows.push(row);
+          }
+          setResults(rows);
+          setStatus({
+            message: `Returned ${rows.length} rows`,
+            isError: false,
+          });
+        } finally {
+          await stmt.finalizeAsync();
+        }
       } else {
         const result = await db.runAsync(query);
         setStatus({
@@ -164,7 +189,6 @@ export default function DevDbScreen() {
       style={{ flex: 1, backgroundColor: '#f5f5f5' }}
       contentContainerStyle={{ padding: 20 }}
     >
-      <Text style={screenStyles.title}>Dev Database</Text>
 
       {/* Schema Exploration */}
       <View style={screenStyles.card}>

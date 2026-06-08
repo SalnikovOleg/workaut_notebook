@@ -47,7 +47,7 @@ const ExercisesScreen = () => {
 
   return (
     <View style={screenStyles.container}>
-      <Text style={screenStyles.title}>Exercises</Text>
+
       <FlatList
         data={exercises}
         keyExtractor={(item) => item.id.toString()}

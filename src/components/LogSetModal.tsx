@@ -77,7 +77,24 @@ const LogSetModal = ({ exercise, scheduleItem, isVisible, onClose }: LogSetModal
           </View>
 
           <View style={styles.content}>
-            <Text style={styles.label}>Log Completed Set</Text>
+
+            <View style={styles.quickSelectRow}>
+              {[5, 10, 15, 20].map((num) => (
+                <TouchableOpacity
+                  key={num}
+                  style={styles.quickButton}
+                  onPress={() => setValue(num.toString())}
+                >
+                  <Text style={styles.quickButtonText}>{num}</Text>
+                </TouchableOpacity>
+              ))}
+              <TouchableOpacity
+                style={[styles.quickButton, styles.plannedButton]}
+                onPress={() => setValue(scheduleItem.target_reps_or_time.toString())}
+              >
+                <Text style={styles.plannedButtonText}>{scheduleItem.target_reps_or_time.toString()}</Text>
+              </TouchableOpacity>
+            </View>
 
             <View style={styles.valueControl}>
               <TouchableOpacity
@@ -102,24 +119,6 @@ const LogSetModal = ({ exercise, scheduleItem, isVisible, onClose }: LogSetModal
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.quickSelectLabel}>Quick Select</Text>
-            <View style={styles.quickSelectRow}>
-              {[5, 10, 15, 20].map((num) => (
-                <TouchableOpacity
-                  key={num}
-                  style={styles.quickButton}
-                  onPress={() => setValue(num.toString())}
-                >
-                  <Text style={styles.quickButtonText}>{num}</Text>
-                </TouchableOpacity>
-              ))}
-              <TouchableOpacity
-                style={[styles.quickButton, styles.plannedButton]}
-                onPress={() => setValue(scheduleItem.target_reps_or_time.toString())}
-              >
-                <Text style={styles.plannedButtonText}>Planned</Text>
-              </TouchableOpacity>
-            </View>
           </View>
 
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>

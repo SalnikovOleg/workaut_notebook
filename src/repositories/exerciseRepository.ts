@@ -5,7 +5,17 @@ export class ExerciseRepository {
   constructor(private db: SQLite.SQLiteDatabase) {}
 
   async getAllExercises(): Promise<Exercise[]> {
-    return await this.db.getAllAsync<Exercise>('SELECT * FROM exercises WHERE deleted = 0');
+    const stmt = await this.db.prepareAsync('SELECT * FROM exercises WHERE deleted = 0');
+    try {
+      const result = await stmt.executeAsync();
+      const rows: Exercise[] = [];
+      for await (const row of result) {
+        rows.push(row as Exercise);
+      }
+      return rows;
+    } finally {
+      await stmt.finalizeAsync();
+    }
   }
 
   async getExerciseById(id: number): Promise<Exercise | null> {
@@ -22,9 +32,10 @@ export class ExerciseRepository {
   }
 
   async updateExercise(id: number, exercise: Partial<Exercise>): Promise<void> {
+    type SQLitePrimitive = string | number | boolean | null;
     const fields = Object.keys(exercise) as Array<keyof Exercise>;
     const filteredFields = fields.filter(key => key !== 'id');
-    const values = filteredFields.map(key => (exercise[key] as unknown));
+    const values = filteredFields.map(key => (exercise[key] as SQLitePrimitive));
     const setClause = filteredFields.map(field => `${String(field)} = ?`).join(', ');
 
     await this.db.runAsync(`UPDATE exercises SET ${setClause} WHERE id = ?`, [...values, id]);

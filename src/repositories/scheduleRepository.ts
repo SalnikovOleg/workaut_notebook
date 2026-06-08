@@ -5,10 +5,17 @@ export class ScheduleRepository {
   constructor(private db: SQLite.SQLiteDatabase) {}
 
   async getScheduleByDay(dayOfWeek: number): Promise<WeeklySchedule[]> {
-    return await this.db.getAllAsync<WeeklySchedule>(
-      'SELECT * FROM weekly_schedule WHERE day_of_week = ?',
-      [dayOfWeek]
-    );
+    const stmt = await this.db.prepareAsync('SELECT * FROM weekly_schedule WHERE day_of_week = ?');
+    try {
+      const result = await stmt.executeAsync([dayOfWeek]);
+      const rows: WeeklySchedule[] = [];
+      for await (const row of result) {
+        rows.push(row as WeeklySchedule);
+      }
+      return rows;
+    } finally {
+      await stmt.finalizeAsync();
+    }
   }
 
   async addScheduledExercise(item: Omit<WeeklySchedule, 'id'>): Promise<number> {
@@ -31,13 +38,17 @@ export class ScheduleRepository {
   }
 
   async getExerciseCountsByDay(): Promise<{ day: number, count: number }[]> {
-    const results = await this.db.getAllAsync<{ count: number }>(
-      'SELECT count(*) as count FROM weekly_schedule GROUP BY day_of_week'
-    );
-    // This is tricky because not all days might have entries.
-    // A better way would be to just query each day or use a more robust SQL query.
-    // But for now, let's implement a simple helper in the service.
-    return results.map((r, index) => ({ day: index + 1, count: r.count })); // This is wrong.
+    const stmt = await this.db.prepareAsync('SELECT count(*) as count FROM weekly_schedule GROUP BY day_of_week');
+    try {
+      const result = await stmt.executeAsync();
+      const rows: { count: number }[] = [];
+      for await (const row of result) {
+        rows.push(row as { count: number });
+      }
+      return rows.map((r, index) => ({ day: index + 1, count: r.count }));
+    } finally {
+      await stmt.finalizeAsync();
+    }
   }
 
   async getCountForDay(dayOfWeek: number): Promise<number> {

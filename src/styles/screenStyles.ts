@@ -15,7 +15,7 @@ export const screenStyles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10,
     color: '#333',
     textAlign: 'center',
   },

@@ -97,7 +97,7 @@ const WorkoutScreen = () => {
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Completed</Text>
             <Text style={styles.statValue}>
-              {actualSets} Sets × {actualValue} {unit}
+              {actualSets} Sets  |  {actualValue} {unit}
             </Text>
           </View>
         </View>
@@ -124,8 +124,8 @@ const WorkoutScreen = () => {
 
   return (
     <View style={screenStyles.container}>
-        <Text style={screenStyles.title}>Today's Workout</Text>
-        <Text style={styles.date}>{today}</Text>
+          <Text style={styles.date}>{today}</Text>
+          <Text style={screenStyles.title}>Let's workout</Text>
 
       {todaySchedule.length === 0 ? (
         <View style={screenStyles.emptyState}>
@@ -156,8 +156,9 @@ const WorkoutScreen = () => {
 const styles = StyleSheet.create({
   date: {
     fontSize: 16,
-    color: '#666',
-    marginTop: 4,
+    color: '#007AFF',
+    fontWeight: '600',
+    marginBottom: 10,
   },
   cardCompleted: {
     borderColor: '#4CAF50',

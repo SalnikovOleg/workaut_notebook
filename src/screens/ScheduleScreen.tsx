@@ -132,8 +132,6 @@ const ScheduleScreen = () => {
 
   return (
     <View style={screenStyles.container}>
-      <Text style={screenStyles.title}>Weekly Schedule</Text>
-
       <View style={styles.daySelector}>
         <View style={styles.dayRow}>
           {[1, 2, 3, 4].map((day) => (

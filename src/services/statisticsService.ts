@@ -9,10 +9,10 @@ export class StatisticsService {
   }
 
   async getActivityTrend(startDate: string, endDate: string): Promise<DailyActivity[]> {
-    return this.statsRepo.getDailyActivity(startDate, endDate);
+      return this.statsRepo.getDailyActivity(startDate, endDate);
   }
 
   async getTopExercises(startDate: string, endDate: string): Promise<TopExercise[]> {
-    return this.statsRepo.getTopExercises(startDate, endDate);
+     return this.statsRepo.getTopExercises(startDate, endDate);
   }
 }
