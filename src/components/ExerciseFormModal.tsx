@@ -12,7 +12,7 @@ import {
   ScrollView
 } from 'react-native';
 import { useWorkoutStore } from '../store/useWorkoutStore';
-import { Exercise } from '../types';
+import { Exercise, ExerciseType } from '../types';
 
 interface ExerciseFormModalProps {
   isVisible: boolean;
@@ -24,7 +24,7 @@ const ExerciseFormModal = ({ isVisible, onClose, editExercise }: ExerciseFormMod
   const { addExercise, updateExercise } = useWorkoutStore();
 
   const [name, setName] = useState('');
-  const [type, setType] = useState(1); // 1: Reps, 2: Time
+  const [type, setType] = useState<ExerciseType>(1); // 1: Reps, 2: Time
   const [minSets, setMinSets] = useState('');
   const [minRepsOrTime, setMinRepsOrTime] = useState('');
 
@@ -61,7 +61,7 @@ const ExerciseFormModal = ({ isVisible, onClose, editExercise }: ExerciseFormMod
     }
 
     try {
-      const exerciseData = {
+      const exerciseData: Omit<Exercise, 'id'> = {
         name: name.trim(),
         type: type,
         min_sets: parseInt(minSets, 10),
