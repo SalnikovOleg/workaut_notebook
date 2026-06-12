@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# generated native folders
+ios/
+android/
+.idea/
+assets/
+prompts/
+.claude/

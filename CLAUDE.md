@@ -25,10 +25,11 @@ The project follows a strict separation of concerns using a Repository Pattern:
 - `src/styles`: Common styles.
 
 ### Data Model
-The app manages three core domains:
+The app manages four core domains:
 1. **Reference**: Exercise definitions (`exercises` table).
 2. **Plan**: Schedules (`weekly_schedule` and `calendar_schedule` tables).
 3. **Fact**: Workout logs (`workout_logs` table, where 1 set = 1 record).
+3. **Statistic**: Statistic. 
 
 ## Key Technologies
 - **Framework**: Expo (React Native)

@@ -1,0 +1,4 @@
+- Use `StyleSheet.create` and centralize common styles in `src/styles/screenStyles.ts`.
+- Use `@expo/vector-icons`.
+- Use functional components with Hooks.
+- No SQL in Components: All database operations must be handled by the repository layer.
