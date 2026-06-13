@@ -53,13 +53,17 @@ const ExercisesScreen = () => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.item}>
+            <TouchableOpacity onPress={() => handleEdit(item)}>
             <View style={styles.itemText}>
-              <Text>{item.name} - {item.min_sets} Sets / {item.min_reps_or_time} {item.type === 1 ? 'Reps' : 'Sec'}</Text>
+                <Text style={styles.itemName}>{item.name}</Text>
+                <Text style={styles.itemDesc}> {item.min_sets} Sets / {item.min_reps_or_time} {item.type === 1 ? 'Reps' : 'Sec'}</Text>
             </View>
+            </TouchableOpacity>
             <View style={styles.itemActions}>
-              <TouchableOpacity onPress={() => handleEdit(item)} style={styles.actionButton}>
-                <Ionicons name="create-outline" size={16} color="#333" />
-              </TouchableOpacity>
+              {/* <TouchableOpacity onPress={() => handleEdit(item)} style={styles.actionButton}>
+                 <Ionicons name="create-outline" size={16} color="#333" /> 
+                 </TouchableOpacity>
+               */}
               <TouchableOpacity onPress={() => handleDelete(item)} style={[styles.actionButton, styles.deleteButton]}>
                 <Ionicons name="trash-outline" size={16} color="#f86e67" />
               </TouchableOpacity>
@@ -94,18 +98,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between'
   },
-  itemText: { flex: 1 },
+  itemName:{
+    fontSize: 16,
+    fontWeight: 'bold',
+    width: 180,
+  },
+  itemDesc: {
+    fontSize: 12,
+  },
+  itemText: { flexDirection: 'row', alignItems: 'center' },
   itemActions: { flexDirection: 'row', gap: 10 },
   actionButton: {
     padding: 8,
     borderRadius: 8,
-    borderColor: '#ccc',
-    borderWidth: 1,
+    /*borderColor: '#ccc',
+    borderWidth: 1,*/
     alignItems: 'center',
     justifyContent: 'center',
   },
   deleteButton: {
-    borderColor: '#f7857f',
+    /*borderColor: '#f7857f',*/
   },
   actionButtonText: {
     fontSize: 12,

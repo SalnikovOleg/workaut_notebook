@@ -55,7 +55,6 @@ const StatisticsScreen = () => {
 
     try {
       const { start, end } = calculateDates(range);
-      console.log(start, end);
       const [summary, activity, topExercises] = await Promise.all([
         statisticsService.getSummary(start, end),
         statisticsService.getActivityTrend(start, end),

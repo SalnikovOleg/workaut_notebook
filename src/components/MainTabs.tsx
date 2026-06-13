@@ -34,8 +34,8 @@ export default function MainTabs() {
         tabBarActiveTintColor: '#007AFF',
         tabBarInactiveTintColor: 'gray',
         tabBarStyle: {
-          paddingBottom: 5,
-          height: 60,
+          //paddingBottom: 5,
+          //height: 60,
         },
       })}
     >

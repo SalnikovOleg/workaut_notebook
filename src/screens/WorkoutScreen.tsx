@@ -13,6 +13,7 @@ import { screenStyles } from '../styles/screenStyles';
 import { useWorkoutStore } from '../store/useWorkoutStore';
 import { WeeklySchedule, Exercise, ScheduledExercise } from '../types';
 import LogSetModal from '../components/LogSetModal';
+import LogTimeModal from '../components/LogTimeModal';
 import ExerciseCard from '../components/ExerciseCard';
 
 const WorkoutScreen = () => {
@@ -49,7 +50,14 @@ const WorkoutScreen = () => {
   );
 
   const renderExerciseCard = ({ item }: { item: ScheduledExercise }) => {
+    // Guard clause: Check if necessary properties exist to prevent ReferenceError
+    if (!item || !item.exercise || !item.schedule) {
+      console.warn("Skipping exercise card rendering due to missing data on item:", item);
+      return null;
+    }
+
     const { exercise, schedule } = item;
+    // Assuming logsActuals[exercise.id] exists structure-wise if the error was not about undefined properties
     const { sets: actualSets = 0, value: actualValue = 0 } = logsActuals[exercise.id] || {};
 
     return (
@@ -100,12 +108,22 @@ const WorkoutScreen = () => {
       )}
 
       {selectedExercise && (
-        <LogSetModal
-          exercise={selectedExercise.exercise}
-          scheduleItem={selectedExercise.schedule}
-          isVisible={!!selectedExercise}
-          onClose={() => setSelectedExercise(null)}
-        />
+        // Check exercise type for conditional rendering logic
+        selectedExercise.exercise.type === 2 ? ( // Time-based logging case
+          <LogTimeModal
+            exercise={selectedExercise.exercise}
+            scheduleItem={selectedExercise.schedule}
+            isVisible={!!selectedExercise}
+            onClose={() => setSelectedExercise(null)}
+          />
+        ) : ( // Set count based logging case (original behavior)
+          <LogSetModal
+            exercise={selectedExercise.exercise}
+            scheduleItem={selectedExercise.schedule}
+            isVisible={!!selectedExercise}
+            onClose={() => setSelectedExercise(null)}
+          />
+        )
       )}
     </View>
   );

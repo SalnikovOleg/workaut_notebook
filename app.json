@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Sheduler",
+    "name": "Scheduler",
     "slug": "Sheduler",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -16,10 +16,15 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.anonymous.Sheduler"
+      "package": "com.anonymous.Scheduler"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "61c8eeaa-b35b-48f4-b33f-b228b0618160"
+      }
     }
   }
 }
