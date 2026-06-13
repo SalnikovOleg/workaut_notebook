@@ -11,25 +11,20 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { screenStyles } from '../styles/screenStyles';
 import { useWorkoutStore } from '../store/useWorkoutStore';
-import { WeeklySchedule, Exercise } from '../types';
+import { WeeklySchedule, Exercise, ScheduledExercise } from '../types';
 import LogSetModal from '../components/LogSetModal';
 import ExerciseCard from '../components/ExerciseCard';
 
-interface ScheduledExercise {
-  schedule: WeeklySchedule;
-  exercise: Exercise;
-}
-
 const WorkoutScreen = () => {
   const {
-    scheduleService,
-    logs,
+    fetchTodaySchedule,
     fetchLogsByDate,
+    todaySchedule,
+    logsActuals,
     isLoading,
     error,
   } = useWorkoutStore();
 
-  const [todaySchedule, setTodaySchedule] = useState<ScheduledExercise[]>([]);
   const [selectedExercise, setSelectedExercise] = useState<{
     exercise: Exercise;
     schedule: WeeklySchedule;
@@ -41,15 +36,8 @@ const WorkoutScreen = () => {
   useFocusEffect(
     useCallback(() => {
       const loadData = async () => {
-        if (!scheduleService) return;
-
         try {
-          const data = await scheduleService.getDaySchedule(dayOfWeek);
-          const mappedSchedule = data.map(item => {
-            const { exercise, ...schedule } = item;
-            return { exercise, schedule };
-          });
-          setTodaySchedule(mappedSchedule);
+          await fetchTodaySchedule(dayOfWeek);
           await fetchLogsByDate(today);
         } catch (err) {
           console.error('Error loading workout data:', err);
@@ -57,19 +45,12 @@ const WorkoutScreen = () => {
       };
 
       loadData();
-    }, [scheduleService, dayOfWeek, today, fetchLogsByDate])
+    }, [dayOfWeek, today, fetchTodaySchedule, fetchLogsByDate])
   );
-
-  const calculateActuals = (exerciseId: number) => {
-    const exerciseLogs = logs.filter((l) => l.exercise_id === exerciseId);
-    const sets = exerciseLogs.length;
-    const value = exerciseLogs.reduce((sum, l) => sum + (l.reps_done_or_actual_time ?? 0), 0);
-    return { sets, value };
-  };
 
   const renderExerciseCard = ({ item }: { item: ScheduledExercise }) => {
     const { exercise, schedule } = item;
-    const { sets: actualSets, value: actualValue } = calculateActuals(exercise.id);
+    const { sets: actualSets = 0, value: actualValue = 0 } = logsActuals[exercise.id] || {};
 
     return (
       <ExerciseCard

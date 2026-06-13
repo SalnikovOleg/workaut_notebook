@@ -6,11 +6,13 @@ import { ScheduleRepository } from '../repositories/scheduleRepository';
 import { StatisticsRepository } from '../repositories/statisticsRepository';
 import { ScheduleService } from '../services/scheduleService';
 import { StatisticsService } from '../services/statisticsService';
-import { Exercise, WorkoutLog } from '../types';
+import { Exercise, WorkoutLog, ScheduledExercise, ExerciseActuals } from '../types';
 
 interface WorkoutState {
   exercises: Exercise[];
   logs: WorkoutLog[];
+  todaySchedule: ScheduledExercise[];
+  logsActuals: Record<number, ExerciseActuals>;
   isLoading: boolean;
   error: string | null;
 
@@ -24,6 +26,7 @@ interface WorkoutState {
   // Actions
   initialize: () => Promise<void>;
   fetchExercises: () => Promise<void>;
+  fetchTodaySchedule: (dayOfWeek: number) => Promise<void>;
   fetchLogsByDate: (date: string) => Promise<void>;
   addExercise: (exercise: Omit<Exercise, 'id'>) => Promise<void>;
   updateExercise: (id: number, exercise: Partial<Exercise>) => Promise<void>;
@@ -35,6 +38,8 @@ interface WorkoutState {
 export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   exercises: [],
   logs: [],
+  todaySchedule: [],
+  logsActuals: {},
   isLoading: false,
   error: null,
   exerciseRepo: null,
@@ -70,12 +75,37 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     }
   },
 
+  fetchTodaySchedule: async (dayOfWeek) => {
+    const { scheduleService } = get();
+    if (!scheduleService) return;
+    try {
+      const data = await scheduleService.getDaySchedule(dayOfWeek);
+      const mappedSchedule = data.map(item => {
+        const { exercise, ...schedule } = item;
+        return { exercise, schedule };
+      });
+      set({ todaySchedule: mappedSchedule });
+    } catch (err) {
+      set({ error: (err as Error).message });
+    }
+  },
+
   fetchLogsByDate: async (date) => {
     const { logRepo } = get();
     if (!logRepo) return;
     try {
       const logs = await logRepo.getLogsByDate(date);
-      set({ logs });
+
+      const logsActuals: Record<number, ExerciseActuals> = {};
+      logs.forEach(log => {
+        if (!logsActuals[log.exercise_id]) {
+          logsActuals[log.exercise_id] = { sets: 0, value: 0 };
+        }
+        logsActuals[log.exercise_id].sets += 1;
+        logsActuals[log.exercise_id].value += log.reps_done_or_actual_time;
+      });
+
+      set({ logs, logsActuals });
     } catch (err) {
       set({ error: (err as Error).message });
     }

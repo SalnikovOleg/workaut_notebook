@@ -32,6 +32,16 @@ export interface WorkoutLog {
   timestamp: string;
 }
 
+export interface ExerciseActuals {
+  sets: number;
+  value: number;
+}
+
+export interface ScheduledExercise {
+  exercise: Exercise;
+  schedule: WeeklySchedule;
+}
+
 export interface StatisticsSummary {
   totalEntries: number;
   totalSets: number;
